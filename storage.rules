@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Deny all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Shared company ledger receipt slips & attachments (no login required, strictly scoped path & file validation)
+    match /ledgers/dain_yongin_shared/slips/{fileName} {
+      allow read: if fileName.size() >= 1 && fileName.size() <= 160;
+
+      allow write: if fileName.size() >= 1
+        && fileName.size() <= 160
+        && !fileName.matches('.*\\.(html|htm|js|mjs|svg|exe|sh|bat|cmd|php)$')
+        && request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 15 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/(jpeg|jpg|png|webp|gif|heic|heif|bmp|avif)')
+          || request.resource.contentType == 'application/pdf'
+          || request.resource.contentType == 'application/octet-stream'
+        );
+
+      allow delete: if fileName.size() >= 1 && fileName.size() <= 160;
+    }
+
+    // Legacy per-user slips remain private read-only for authenticated owners during one-time migration
+    match /users/{userId}/slips/{fileName} {
+      allow read: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.uid == userId;
+    }
+  }
+}

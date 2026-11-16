@@ -1,0 +1,6 @@
+{
+  "name": "현장 자재 입고 및 반입 체크리스트",
+  "description": "건설 및 공사 현장에서 자재 품목, 규격, 예정/반입 수량 및 상태를 손쉽게 기록하고 관리하는 모바일 및 PC 대응 자재 검수 체크리스트 웹 앱",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
